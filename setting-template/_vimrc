@@ -1,0 +1,231 @@
+" An example for a vimrc file.
+"
+" Maintainer:	Bram Moolenaar <Bram@vim.org>
+" Last change:	2002 Sep 19
+"
+" To use it, copy it to
+"     for Unix and OS/2:  ~/.vimrc
+"	      for Amiga:  s:.vimrc
+"  for MS-DOS and Win32:  $VIM\_vimrc
+"	    for OpenVMS:  sys$login:.vimrc
+
+" When started as "evim", evim.vim will already have done these settings.
+if v:progname =~? "evim"
+  finish
+endif
+
+" Use Vim settings, rather then Vi settings (much better!).
+" This must be first, because it changes other options as a side effect.
+set nocompatible
+
+" allow backspacing over everything in insert mode
+set backspace=indent,eol,start
+
+if has("vms")
+  set nobackup		" do not keep a backup file, use versions instead
+else
+  set backup		" keep a backup file
+endif
+set history=50		" keep 50 lines of command line history
+set ruler		" show the cursor position all the time
+set showcmd		" display incomplete commands
+set incsearch		" do incremental searching
+
+" For Win32 GUI: remove 't' flag from 'guioptions': no tearoff menu entries
+" let &guioptions = substitute(&guioptions, "t", "", "g")
+
+" Don't use Ex mode, use Q for formatting
+map Q gq
+
+" This is an alternative that also works in block mode, but the deleted
+" text is lost and it only works for putting the current register.
+"vnoremap p "_dp
+
+" Switch syntax highlighting on, when the terminal has colors
+" Also switch on highlighting the last used search pattern.
+if &t_Co > 2 || has("gui_running")
+  syntax on
+  set hlsearch
+endif
+
+" Only do this part when compiled with support for autocommands.
+if has("autocmd")
+
+  " Enable file type detection.
+  " Use the default filetype settings, so that mail gets 'tw' set to 72,
+  " 'cindent' is on in C files, etc.
+  " Also load indent files, to automatically do language-dependent indenting.
+  filetype plugin indent on
+
+  " Put these in an autocmd group, so that we can delete them easily.
+  augroup vimrcEx
+  au!
+
+  " For all text files set 'textwidth' to 78 characters.
+  autocmd FileType text setlocal textwidth=78
+
+  " When editing a file, always jump to the last known cursor position.
+  " Don't do it when the position is invalid or when inside an event handler
+  " (happens when dropping a file on gvim).
+  autocmd BufReadPost *
+    \ if line("'\"") > 0 && line("'\"") <= line("$") |
+    \   exe "normal g`\"" |
+    \ endif
+
+  augroup END
+
+else
+
+  set autoindent		" always set autoindenting on
+
+endif " has("autocmd")
+
+"
+"
+if &encoding !=# 'utf-8'
+	set encoding=japan
+	set fileencoding=japan
+endif
+if has('iconv')
+	let s:enc_euc = 'euc-jp'
+	let s:enc_jis = 'iso-2022-jp'
+	if iconv("\x87\x64\x87\x6a", 'cp932', 'eucjp-ms') ==# "\xad\xc5\xad\xcb"
+		let s:enc_euc = 'eucjp-ms'
+		let s:enc_jis = 'iso-2022-jp-3'
+	elseif iconv("\x87\x64\x87\x6a", 'cp932', 'euc-jisx0213') ==# "\xad\xc5\xad\xcb"
+		let s:enc_euc = 'euc-jisx0213'
+		let s:enc_jis = 'iso-2022-jp-3'
+	endif
+	if &encoding ==# 'utf-8'
+		let s:fileencodings_default = &fileencodings
+		let &fileencodings = s:enc_jis .','. s:enc_euc .',cp932'
+		let &fileencodings = &fileencodings .','. s:fileencodings_default
+		unlet s:fileencodings_default
+	else
+		let &fileencodings = &fileencodings .','. s:enc_jis
+		set fileencodings+=utf-8,ucs-2le,ucs-2
+		if &encoding =~# '^\(euc-jp\|euc-jisx0213\|eucjp-ms\)$'
+			set fileencodings+=cp932
+			set fileencodings-=euc-jp
+			set fileencodings-=euc-jisx0213
+			set fileencodings-=eucjp-ms
+			let &encoding = s:enc_euc
+			let &fileencoding = s:enc_euc
+		else
+			let &fileencodings = &fileencodings .','. s:enc_euc
+		endif
+	endif
+	unlet s:enc_euc
+	unlet s:enc_jis
+endif
+if has('autocmd')
+	function! AU_ReCheck_FENC()
+		if &fileencoding =~# 'iso-2022-jp' && search("[^\x01-\x7e]", 'n') == 0
+			let &fileencoding=&encoding
+		endif
+	endfunction
+	autocmd BufReadPost * call AU_ReCheck_FENC()
+endif
+
+" オリジナル
+" NeoBundleの設定 TOP
+if has('vim_starting')
+	set runtimepath+=~/.vim/bundle/neobundle.vim
+endif
+
+call neobundle#begin(expand('~/.vim/bundle'))
+
+NeoBundleFetch 'Shougo/neobundle.vim'
+
+" 以下に読み込むプラグインを追加
+NeoBundle 'itchyny/lightline.vim'
+NeoBundle 'kchmck/vim-coffee-script'
+
+NeoBundle 'plasticboy/vim-markdown'
+NeoBundle 'kannokanno/previm'
+NeoBundle 'tyru/open-browser.vim'
+
+call neobundle#end()
+
+
+filetype plugin indent on
+
+NeoBundleCheck
+
+" NeoBundleの設定 END
+
+
+" コマンド登録
+"command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis | wincmd p | diffthis
+command -range=% Xmllint :silent <line1>,<line2>!xmllint --format --recover - 2>/dev/null
+
+set nobackup
+set noundofile
+set ts=4
+set softtabstop=4
+set sw=4
+"set enc=unicode
+set fenc=utf-8
+set fencs=ucs-bom,iso2022-jp,utf-8,euc-jp,cp932
+set fileformats=dos,unix
+"set linespace=1
+",utf-16le
+set nu
+set helplang=ja
+set ambiwidth=double
+"language ja_jp.utf-8
+set ai
+set cursorline
+"set laststatus=2
+"set statusline=%<%f\ %m%r%h%w%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%l,%c%V%8P
+
+"set iminsert=0
+"set imsearch=-1
+
+"set foldmethod=indent
+set foldmethod=syntax
+set foldlevelstart=20
+set grepprg=internal
+
+let g:xml_syntax_folding = 1
+let g:cpp_syntax_folding = 1
+let g:c_syntax_folding = 1
+
+let g:netrw_dav_cmd="cadaver"
+let g:netrw_ftp_cmd="ftp"
+let g:netrw_http_cmd="curl -o"
+let g:netrw_rsync_cmd="rsync -a"
+let g:netrw_scp_cmd="scp -q"
+let g:netrw_sftp_cmd="sftp"
+
+" lightline
+let g:lightline = {
+	\ 'colorscheme': 'jellybeans',
+	\ }
+
+" 挿入モードの省略入力
+" ,dt - 日付
+"inoremap ,dt <C-R>=strftime("%Y-%m-%d (%a)")<CR>
+nnoremap <C-@>td a<C-R>=PrintDate(0)<CR> <Esc>
+"nnoremap <C-x>tod i<C-R>=strftime("%Y-%m-%d (%a)")<CR>
+" ,tm - 時刻
+"inoremap ,tm <C-R>=strftime("%H:%M:%S")<CR>
+nnoremap <C-@>nw a<C-R>=strftime("%H:%M:%S")<CR> <Esc>
+
+" 日付を出力
+function PrintDate(sub_day)
+	let now = localtime()
+	let day = a:sub_day * (60 * 60 * 24)
+
+	return strftime("%Y-%m-%d (%a)", now + day)
+
+endfunction
+
+" jq 設定
+if executable('jq')
+	function! s:jq(...)
+		execute '%!jq' (a:0 == 0 ? '.' : a:1)
+	endfunction
+	command! -bar -nargs=? Jq call s:jq(<f-args>)
+endif
+

@@ -1,0 +1,30 @@
+colorscheme torte
+"set guioptions+=a
+"set guioptions-=m
+" 
+set columns=84
+set lines=40
+"set linespace=4
+"set imcmdline=off
+"set iminsert=0
+set imsearch=-1
+" コマンドラインに使われる画面行数
+set cmdheight=1
+
+" アンチエイリアス
+"set nomacatsui anti enc=utf-8 tenc=japan gfn=Monaco:h11
+"set nomacatsui anti tenc=japan gfn=Osaka-Mono:h12
+if  has('mac') || has('gui_macvim')
+	set guifont=Monaco:h11
+	set guifontwide=Monaco:h11
+	set transparency=10
+
+elseif has('gui_running')
+	"set guifont=ms_gothic:h11
+"	set guifont=SourceHanCodeJP-Normal:h10
+"	set guifontwide=ms_gothic:h11
+	set guifont=Myrica_M:h12
+"	set guifont=*
+	set guifontwide=Myrica_M:h12
+
+endif

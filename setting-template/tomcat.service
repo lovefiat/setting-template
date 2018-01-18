@@ -1,0 +1,20 @@
+[Unit]
+Description=Apache Tomcat Web Application Container
+Requires=mysqld.service
+Wants=httpd.service
+After=syslog.target network.target mysqld.service httpd.service
+
+[Service]
+Type=forking
+
+User=tomcat
+Group=tomcat
+
+PIDFile=/var/run/tomcat/tomcat@scenario.pid
+Environment=CATALINA_PID=/var/run/tomcat/tomcat@scenario.pid
+
+ExecStart=/usr/local/tomcat@scenario/bin/startup.sh
+ExecStop =/usr/local/tomcat@scenario/bin/shutdown.sh
+
+[Install]
+WantedBy=multi-user.target
