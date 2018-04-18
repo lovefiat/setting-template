@@ -128,32 +128,37 @@ if has('autocmd')
 endif
 
 " オリジナル
-" NeoBundleの設定 TOP
-if has('vim_starting')
-	set runtimepath+=~/.vim/bundle/neobundle.vim
+"" deinの設定 TOP
+if &compatible
+ set nocompatible
 endif
+" Add the dein installation directory into runtimepath
+set runtimepath+=~/.cache/dein/repos/github.com/Shougo/dein.vim
 
-call neobundle#begin(expand('~/.vim/bundle'))
+if dein#load_state('~/.cache/dein')
+ call dein#begin('~/.cache/dein')
 
-NeoBundleFetch 'Shougo/neobundle.vim'
+ call dein#add('~/.cache/dein')
+ call dein#add('Shougo/deoplete.nvim')
+ if !has('nvim')
+   call dein#add('roxma/nvim-yarp')
+   call dein#add('roxma/vim-hug-neovim-rpc')
+ endif
+ call dein#add('itchyny/lightline.vim')
+ call dein#add('plasticboy/vim-markdown')
+ call dein#add('kannokanno/previm')
+ call dein#add('tyru/open-browser.vim')
+ call dein#add('ryanoasis/vim-devicons')
+ call dein#add('w0rp/ale')
+ call dein#add('scrooloose/nerdtree')
 
-" 以下に読み込むプラグインを追加
-NeoBundle 'itchyny/lightline.vim'
-NeoBundle 'kchmck/vim-coffee-script'
-
-NeoBundle 'plasticboy/vim-markdown'
-NeoBundle 'kannokanno/previm'
-NeoBundle 'tyru/open-browser.vim'
-
-call neobundle#end()
-
+ call dein#end()
+ call dein#save_state()
+endif
+"" deinの設定 END
 
 filetype plugin indent on
-
-NeoBundleCheck
-
-" NeoBundleの設定 END
-
+syntax enable
 
 " コマンド登録
 "command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis | wincmd p | diffthis
@@ -167,6 +172,7 @@ set sw=4
 "set enc=unicode
 set fenc=utf-8
 set fencs=ucs-bom,iso2022-jp,utf-8,euc-jp,cp932
+set termencoding=utf-8
 set fileformats=dos,unix
 "set linespace=1
 ",utf-16le
@@ -199,9 +205,14 @@ let g:netrw_scp_cmd="scp -q"
 let g:netrw_sftp_cmd="sftp"
 
 " lightline
+"let g:lightline = {
+"	\ 'colorscheme': 'solarized',
+"	\ }
+
 let g:lightline = {
 	\ 'colorscheme': 'jellybeans',
 	\ }
+
 
 " 挿入モードの省略入力
 " ,dt - 日付
